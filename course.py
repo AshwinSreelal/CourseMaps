@@ -1,11 +1,11 @@
 
 class Course:
-    def __init__(self,title, course_info, num_units,prereqs, postreqs, related_courses):
+    def __init__(self,title, course_info, num_units, prereqs, followups, related_courses):
         self.title = title
         self.course_info = course_info
         self.num_units = num_units
         self.prereqs = prereqs
-        self.postreqs = postreqs
+        self.followups = followups
         self.related_courses = related_courses
     
     def get_title(self):
@@ -20,8 +20,8 @@ class Course:
     def get_prereqs(self):
         return self.prereqs
 
-    def get_postreqs(self):
-        return self.postreqs
+    def get_followups(self):
+        return self.followups
 
     def get_related_courses(self):
         return self.related_courses
@@ -29,8 +29,8 @@ class Course:
     def add_prereq(self,new_prereq):
         self.prereqs.append(new_prereq)
 
-    def add_postreq(self,new_postreq):
-        self.postreqs.append(new_postreq)
+    def add_followup(self,new_followup):
+        self.followups.append(new_followup)
 
     def add_related_course(self,new_related):
         self.related_courses.append(new_related)

@@ -1,37 +1,43 @@
 from course import Course
 class Database:
     def __init__(self):
-        self.courselist={}
+        self.courselist = {}
     
     def add_course(self, name, course):
-        self.courselist[name]=course
+        self.courselist[name] = course
     
     def convert_file(self,name):
-        course_file=open(name)
+        course_file = open(name)
         for line in course_file:
             read = False
-            i=0
-            data=[]
-            text=''
+            i = 0
+            data = []
+            text = ''
             for char in line:
                 if char == "'":
                     if read:
-                        read=False
+                        read = False
                         data.append(text)
-                        text=''
-                        i+=1
+                        text = ''
+                        i += 1
                     else:
-                        read=True
+                        read = True
                 elif read:
-                    text+=char
+                    text += char
             print(data)
-            self.courselist[data[0]]= Course(data[0], data[1], int(data[2]), data[3].split(),data[4].split(),data[5].split())
+            self.courselist[data[0]] = Course(data[0], data[1], int(data[2]), data[3].split(),data[4].split(),data[5].split())
 
     def get_course(self,name):
         return self.courselist[name]
 
     def get_prereq_courses(self,name):
-        courses=[]
+        courses = []
         for prereq in self.courselist[name].get_prereqs():
             courses.append(self.get_course(prereq))
-        return courses 
+        return courses
+
+    def get_followup_courses(self, name):
+        courses = []
+        for follow in self.courselist[name].get_followups():
+            courses.append(self.get_course(follow))
+        return courses
