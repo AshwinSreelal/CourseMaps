@@ -41,3 +41,9 @@ class Database:
         for follow in self.courselist[name].get_followups():
             courses.append(self.get_course(follow))
         return courses
+
+    def get_related_courses(self,name):
+        courses=[]
+        for related in self.courselist[name].get_related_courses():
+            courses.append(self.get_course(related))
+        return courses

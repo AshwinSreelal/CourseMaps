@@ -26,15 +26,15 @@ class CmapsGui(tkinter.Tk):
         self.display.grid(column = 1, row = 1)
         self.dispScrollBar.grid(column = 0, row = 1, sticky = "NS")
         self.display.create_line(self.w // 2, 0, self.w // 2, self.h)
+
         self.courseRect = self.display.create_rectangle(0, 0, 0, 0, fill = "white")
         self.courseText = self.display.create_text(0, 0, text = "")
         self.coursePrereqRects = []
         self.courseFollowRects = []
-
         self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h//4)
         self.courseInfo.grid(column = 2, row = 1)
         self.infoText = self.courseInfo.create_text(0, 0, text = "")
-        
+        self.relatedCourses =[]
         self.quitButton = tkinter.Button(self, text='Quit',command=self.quit)
         self.quitButton.grid(column= 2, row=1, sticky = "NE", padx=20)
         self.colorDict={}
@@ -57,9 +57,17 @@ class CmapsGui(tkinter.Tk):
             for prereq in self.coursePrereqRects:
                 for icon in prereq:
                     self.display.delete(icon)
+            for related in self.relatedCourses:
+                    self.courseInfo.delete(related)
             self.infoText = self.courseInfo.create_text(100, 100, anchor = "nw", 
                                                         text = "Units: " + str(self.currentCourse.get_num_units()) + "\n\n" + self.currentCourse.get_courseinfo(), 
                                                         width = self.w // 2 - 200)
+            relateds=self.database.get_related_courses(self.currentCourse.get_title())
+            relatedsLength = len(relateds)
+            self.relatedCourses.append(self.courseInfo.create_text(self.w//4,25, text="RELATED COURSES: "))
+            for i in range(relatedsLength):
+                self.relatedCourses.append(self.courseInfo.create_window(25+(self.w-25)*(i+1)//(4*relatedsLength) ,50,window=tkinter.Button(self,text=relateds[i].get_title(),
+                                     fg="green", command = self.OnButtonClick(relateds[i]))))
             scale = 80
             followups = self.database.get_followup_courses(self.currentCourse.get_title())
             followLength = len(followups)
