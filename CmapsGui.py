@@ -1,5 +1,4 @@
-import tkinter, database, course
-
+import tkinter, database, course, random
 class CmapsGui(tkinter.Tk):
     def __init__(self, parent):
         tkinter.Tk.__init__(self, parent)
@@ -32,10 +31,13 @@ class CmapsGui(tkinter.Tk):
         self.coursePrereqRects = []
         self.courseFollowRects = []
 
-        self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h)
+        self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h//4)
         self.courseInfo.grid(column = 2, row = 1)
         self.infoText = self.courseInfo.create_text(0, 0, text = "")
-
+        
+        self.quitButton = tkinter.Button(self, text='Quit',command=self.quit)
+        self.quitButton.grid(column= 2, row=1, sticky = "NE", padx=20)
+        self.colorDict={}
     def OnCourseEntry(self, event):
         try:
             self.currentCourse = self.database.get_course(self.entryValue.get().upper())
@@ -65,7 +67,7 @@ class CmapsGui(tkinter.Tk):
                 width_center = (self.w * (2 * i + 1)) // (4 * followLength)
                 temp = []
                 temp.append(self.display.create_window(width_center, (self.h // 2) - scale,
-                                                       window = tkinter.Button(self, text = followups[i].get_title(), command = self.OnButtonClick(followups[i]))))
+                                                       window = tkinter.Button(self, text = followups[i].get_title(),fg="blue", command = self.OnButtonClick(followups[i]))))
                 temp.append(self.display.create_line(width_center, (self.h // 2) - scale + self.sSize // 2,
                                                      self.w // 4, self.h // 2 - self.sSize // 2))
                 self.courseFollowRects.append(temp)
@@ -78,7 +80,9 @@ class CmapsGui(tkinter.Tk):
                     width_center = widthleft + (widthright - widthleft) * (2 * i + 1) // (2 * preReqLength)
                     temp = []
                     temp.append(self.display.create_window(width_center, (self.h // 2) + scale * level,
-                                                           window = tkinter.Button(self, text = preReqs[i].get_title(), command = self.OnButtonClick(preReqs[i]))))
+                                                          window = tkinter.Button(self, text = preReqs[i].get_title(),
+                                                          fg=self.colorForeground(level), bg =self.colorBackground(preReqs[i].get_title()),
+                                                          command = self.OnButtonClick(preReqs[i]))))
                     if(level):
                         temp.append(self.display.create_line(width_center, (self.h // 2) + scale * level - self.sSize // 2, 
                                                              widthleft + (widthright - widthleft) // 2, self.h // 2 + scale * (level - 1) + self.sSize // 2))
@@ -88,7 +92,18 @@ class CmapsGui(tkinter.Tk):
                         printPreReqs(preReq2, level + 1, widthleft + ((widthright - widthleft) * i) // len(preReqs), 
                                      widthleft + ((widthright - widthleft) * (i + 1)) // len(preReqs))
             printPreReqs([self.currentCourse], 0, 0,self.w//2)
-
+    def colorBackground(self,classname):
+        if classname in self.colorDict:
+            return self.colorDict[classname]
+        else:
+            r = lambda: random.randint(128,255)
+            self.colorDict[classname]=('#%02X%02X%02X' % (r(),r(),r()))
+        return self.colorDict[classname]
+    def colorForeground(self,level):
+        if level:
+            return "black"
+        else:
+            return "dark blue"
     def OnButtonClick(self, course):
         return lambda: self.printCourseTree(course)
 
