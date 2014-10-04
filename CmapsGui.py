@@ -25,9 +25,11 @@ class CmapsGui(tkinter.Tk):
         self.display.create_line(self.w // 2, 0, self.w // 2, self.h)
         self.courseRect = self.display.create_rectangle(0, 0, 0, 0, fill = "white")
         self.courseText = self.display.create_text(0, 0, text = "")
+        self.coursePrereqRects = []
 
         self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h)
         self.courseInfo.grid(column = 1, row = 1)
+        self.infoText = self.courseInfo.create_text(0, 0, text = "")
 
     def OnCourseEntry(self, event):
         try:
@@ -37,9 +39,31 @@ class CmapsGui(tkinter.Tk):
         if self.currentCourse:
             self.display.delete(self.courseRect)
             self.display.delete(self.courseText)
-            self.courseRect = self.display.create_rectangle(self.w // 4 - self.sSize // 2, self.h // 2 - self.sSize // 2, self.w // 4 + self.sSize // 2, self.h // 2 + self.sSize // 2, fill = "white")
+            self.courseInfo.delete(self.infoText)
+            for prereq in self.coursePrereqRects:
+                for icon in prereq:
+                    self.display.delete(icon) 
+            x1, y1, x2, y2 = self.centerToCorners(self.w // 4, self.h // 2, self.sSize)
+            self.courseRect = self.display.create_rectangle(x1, y1, x2, y2, fill = "white")
             self.courseText = self.display.create_text(self.w // 4, self.h // 2, text = self.currentCourse.get_title())
+            self.infoText = self.courseInfo.create_text(100, 100, anchor = "nw", 
+                                                        text = "Units: " + str(self.currentCourse.get_num_units()) + "\n\n" + self.currentCourse.get_courseinfo(), 
+                                                        width = self.w // 2 - 200)
+            preReqs = self.database.get_prereq_courses(self.currentCourse.get_title())
+            preReqLength = len(preReqs)
+            for i in range(preReqLength):
+                width_center = (self.w * (2 * i + 1)) / (4 * preReqLength)
+                temp = []
+                x1, y1, x2, y2 = self.centerToCorners(width_center, (self.h * 3) // 4, self.sSize)
+                temp.append(self.display.create_rectangle(x1, y1, x2, y2, fill = "white"))
+                temp.append(self.display.create_text(width_center, (self.h * 3) // 4, text = preReqs[i].get_title()))
+                temp.append(self.display.create_line(width_center, (self.h * 3) // 4 - self.sSize // 2, self.w // 4, self.h // 2 + self.sSize // 2))
+                self.coursePrereqRects.append(temp)
+
+                
         
+    def centerToCorners(self, x, y, sideLength):
+        return x - sideLength // 2, y - sideLength // 2, x + sideLength // 2, y + sideLength // 2
 
 if __name__ == "__main__":
     app = CmapsGui(None)

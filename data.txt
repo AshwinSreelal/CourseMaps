@@ -1,2 +1,4 @@
-'CS61A' 'This course is a course' '4' 'CS10' 'CS61C CS61B' 'RelatedCourse'
+'CS61A' 'This course is a course' '4' 'CS10 MATH1A MATH1B' 'CS61C CS61B' 'RelatedCourse'
 'CS10' 'A really basic CS course' '3' '' 'CS61A' ''
+'MATH1A' 'Some scrub easy class that I dont need to take' '0' '' 'CS61A' ''
+'MATH1B' 'So apparently this course is really hard' '10' '' 'CS61A' ''
