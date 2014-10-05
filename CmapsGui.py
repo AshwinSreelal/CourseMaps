@@ -40,7 +40,7 @@ class CmapsGui(tkinter.Tk):
         #Create display to show tree mapping of courses
         self.display = tkinter.Canvas(self, width = self.w // 2, height = self.h)
         self.display.grid(column = 0, row = 1)
-\
+
         #Create area to show course description
         self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h)
         self.courseInfo.grid(column = 1, row = 1, sticky = "NW")
