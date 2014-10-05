@@ -38,11 +38,13 @@ class CmapsGui(tkinter.Tk):
         self.quitButton.grid(column = 1, row = 0, sticky = "NE", padx = 20)
 
         #Create display to show tree mapping of courses
-        self.display = tkinter.Canvas(self, width = self.w // 2, height = self.h)
+        self.disp_w = 2 * self.w // 3
+        self.display = tkinter.Canvas(self, width = self.disp_w, height = self.h)
         self.display.grid(column = 0, row = 1)
 
-        #Create area to show course description
-        self.courseInfo = tkinter.Canvas(self, width = self.w // 2, height = self.h)
+        #Create area to show course descriptioni
+        self.info_w = self.w // 3
+        self.courseInfo = tkinter.Canvas(self, width = self.info_w, height = self.h)
         self.courseInfo.grid(column = 1, row = 1, sticky = "NW")
 
         #Declare instance variables and initialize them to placeholder values
@@ -96,29 +98,29 @@ class CmapsGui(tkinter.Tk):
                     self.courseInfo.delete(related)
 
             #Prints out course info on the right side of the window
-            self.infoText = self.courseInfo.create_text(self.w // 16, self.h // 6, anchor = "nw", 
-                                                        text = "Units: " + str(self.currentCourse.get_num_units()) + "\n\n" + self.currentCourse.get_courseinfo(), 
-                                                        width = (3 * self.w) // 8)
+            self.infoText = self.courseInfo.create_text(self.info_w // 8, self.h // 16, anchor = "nw", 
+                                                        text = self.currentCourse.get_title() + "\n" + "Units: " + str(self.currentCourse.get_num_units()) + "\n\n" + self.currentCourse.get_courseinfo(), 
+                                                        width = (3 * self.info_w) // 4)
             
             #Prints out a list of buttons pointing to all related courses, if applicable
-            relateds=self.database.get_related_courses(self.currentCourse.get_title())
+            relateds = self.database.get_related_courses(self.currentCourse.get_title())
             relatedsLength = len(relateds)
-            self.relatedCourses.append(self.courseInfo.create_text(self.w // 4, (2 * self.h) // 5, text="RELATED COURSES: "))
+            self.relatedCourses.append(self.courseInfo.create_text(self.info_w // 4, (9 * self.h) // 20, text = "Related Courses: "))
             for i in range(relatedsLength):
-                self.relatedCourses.append(self.courseInfo.create_window(25+(self.w//2-25)*(i+1)//(2 * relatedsLength), self.h // 2,window=tkinter.Button(self,text=relateds[i].get_title(),
-                                     fg="green", command = self.OnButtonClick(relateds[i]))))
+                self.relatedCourses.append(self.courseInfo.create_window(self.info_w // 4 + (self.info_w * 3 * i) // 16, self.h // 2, 
+                                           window = tkinter.Button(self, text = relateds[i].get_title(), fg = "green", command = self.OnButtonClick(relateds[i]))))
 
             #Prints out a list of followup courses and lines to connect them to the current course
-            scale = 80
+            scale = 70
             followups = self.database.get_followup_courses(self.currentCourse.get_title())
             followLength = len(followups)
             for i in range(followLength):
-                width_center = (self.w * (2 * i + 1)) // (4 * followLength)
+                width_center = (self.disp_w * (2 * i + 1)) // (2 * followLength)
                 temp = []
-                temp.append(self.display.create_window(width_center, (self.h // 6) - scale,
-                                                       window = tkinter.Button(self, text = followups[i].get_title(),fg="blue", command = self.OnButtonClick(followups[i]))))
-                temp.append(self.display.create_line(width_center, (self.h // 6) - scale + self.sSize // 2,
-                                                     self.w // 4, self.h // 6 - self.sSize // 2))
+                temp.append(self.display.create_window(width_center, (self.h // 8) - scale,
+                                                       window = tkinter.Button(self, text = followups[i].get_title(),fg = "blue", command = self.OnButtonClick(followups[i]))))
+                temp.append(self.display.create_line(width_center, (self.h // 8) - scale + self.sSize // 2,
+                                                     self.disp_w // 2, self.h // 8 - self.sSize // 2))
                 self.courseFollowRects.append(temp)
 
             """
@@ -131,13 +133,13 @@ class CmapsGui(tkinter.Tk):
                 for i in range(preReqLength):
                     width_center = widthleft + (widthright - widthleft) * (2 * i + 1) // (2 * preReqLength)
                     temp = []
-                    temp.append(self.display.create_window(width_center, (self.h // 6) + scale * level,
+                    temp.append(self.display.create_window(width_center, (self.h // 8) + scale * level,
                                                           window = tkinter.Button(self, text = preReqs[i].get_title(),
                                                           fg = self.colorForeground(level), bg = self.colorBackground(preReqs[i].get_title()),
                                                           command = self.OnButtonClick(preReqs[i]))))
                     if(level):
-                        temp.append(self.display.create_line(width_center, (self.h // 6) + scale * level - self.sSize // 2, 
-                                                             widthleft + (widthright - widthleft) // 2, self.h // 6 + scale * (level - 1) + self.sSize // 2))
+                        temp.append(self.display.create_line(width_center, (self.h // 8) + scale * level - self.sSize // 2, 
+                                                             widthleft + (widthright - widthleft) // 2, self.h // 8 + scale * (level - 1) + self.sSize // 2))
                     self.coursePrereqRects.append(temp)
                     preReq2 = self.database.get_prereq_courses(preReqs[i].get_title())
                     if len(preReq2):
@@ -145,7 +147,7 @@ class CmapsGui(tkinter.Tk):
                                      widthleft + ((widthright - widthleft) * (i + 1)) // len(preReqs))
             
             #Initiates the resursive call by passing in the current course as the first argument
-            printPreReqs([self.currentCourse], 0, 0,self.w//2)
+            printPreReqs([self.currentCourse], 0, 0,self.disp_w)
 
     """
     Gives an item a random colored background to improve the aesthetics of the
